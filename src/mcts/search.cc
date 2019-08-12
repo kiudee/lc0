@@ -223,15 +223,19 @@ std::vector<std::string> Search::GetVerboseStats(Node* node,
   std::sort(
       edges.begin(), edges.end(),
       [&fpu, &U_coeff](EdgeAndNode a, EdgeAndNode b) {
-        return std::forward_as_tuple(a.GetN(), a.GetQ(fpu) + a.GetNewU(U_coeff)) <
-               std::forward_as_tuple(b.GetN(), b.GetQ(fpu) + b.GetNewU(U_coeff));
+        return std::forward_as_tuple(a.GetN(),
+                                     a.GetQ(fpu) + a.GetNewU(U_coeff)) <
+               std::forward_as_tuple(b.GetN(),
+                                     b.GetQ(fpu) + b.GetNewU(U_coeff));
       });  
   } else {
   std::sort(
       edges.begin(), edges.end(),
       [&fpu, &U_coeff](EdgeAndNode a, EdgeAndNode b) {
-        return std::forward_as_tuple(a.GetN(), a.GetQ(fpu) + a.GetU(U_coeff)) <
-               std::forward_as_tuple(b.GetN(), b.GetQ(fpu) + b.GetU(U_coeff));
+        return std::forward_as_tuple(a.GetN(),
+                                     a.GetQ(fpu) + a.GetU(U_coeff)) <
+               std::forward_as_tuple(b.GetN(),
+                                     b.GetQ(fpu) + b.GetU(U_coeff));
       });
   }
 
@@ -987,7 +991,8 @@ SearchWorker::NodeToProcess SearchWorker::PickNodeToExtend(
     }
 
     if (second_best_edge) {
-      int estimated_visits_to_change_best =
+      int estimated_visits_to_change_best = params_.GetNewUEnabled() ?
+          best_edge.GetVisitsToReachNewU(second_best, puct_mult, fpu) :
           best_edge.GetVisitsToReachU(second_best, puct_mult, fpu);
       // Only cache for n-2 steps as the estimate created by GetVisitsToReachU
       // has potential rounding errors and some conservative logic that can push
