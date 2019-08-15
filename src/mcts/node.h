@@ -37,6 +37,7 @@
 #include "chess/position.h"
 #include "neural/encoder.h"
 #include "neural/writer.h"
+#include "utils/fastmath.h"
 #include "utils/mutex.h"
 
 namespace lczero {
@@ -363,7 +364,8 @@ class EdgeAndNode {
   }
 
   float GetNewU(float numerator) const {
-    return numerator * GetP() / std::pow(1.0 + GetNStarted(), 1.5);
+    const float x = 1 + GetNStarted();
+    return numerator * GetP() * FastInvSqrt(x) / x;
   }
 
   int GetVisitsToReachU(float target_score, float numerator,

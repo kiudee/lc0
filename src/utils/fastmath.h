@@ -77,4 +77,16 @@ inline float FastLog(const float a) {
 // Fast approximate exp(x). Does only limited range checking.
 inline float FastExp(const float a) { return FastPow2(1.442695040f * a); }
 
+inline float FastInvSqrt(const float number)
+{ 
+  const float x2 = number * 0.5F;
+  const float threehalfs = 1.5F;
+  float f;
+  uint32_t i;
+  memcpy(&i, &number, sizeof(float));
+  i  = 0x5f3759df - ( i >> 1 );
+  memcpy(&f, &i, sizeof(float));
+  return f * ( threehalfs - ( x2 * f * f ) );
+}
+
 }  // namespace lczero
