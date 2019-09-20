@@ -49,10 +49,10 @@ class SearchParams {
     return options_.Get<int>(kMaxPrefetchBatchId.GetId());
   }
   bool GetLogitQ() const { return kLogitQ; }
+  bool GetNewUEnabled() const { return kNewUEnabled; }
   float GetCpuct() const { return kCpuct; }
   float GetCpuctBase() const { return kCpuctBase; }
   float GetCpuctFactor() const { return kCpuctFactor; }
-  bool GetNewUEnabled() const { return kNewUEnabled; }
   float GetTemperature() const {
     return options_.Get<float>(kTemperatureId.GetId());
   }
@@ -106,10 +106,10 @@ class SearchParams {
   static const OptionId kMiniBatchSizeId;
   static const OptionId kMaxPrefetchBatchId;
   static const OptionId kLogitQId;
+  static const OptionId kNewUEnabledId;
   static const OptionId kCpuctId;
   static const OptionId kCpuctBaseId;
   static const OptionId kCpuctFactorId;
-  static const OptionId kNewUEnabledId;
   static const OptionId kTemperatureId;
   static const OptionId kTempDecayMovesId;
   static const OptionId kTemperatureCutoffMoveId;
@@ -148,10 +148,10 @@ class SearchParams {
   // TODO(crem) Some of those parameters can be converted to be dynamic after
   //            trivial search optimiations.
   const bool kLogitQ;
+  const bool kNewUEnabled;
   const float kCpuct;
   const float kCpuctBase;
   const float kCpuctFactor;
-  const bool kNewUEnabled;
   const float kNoiseEpsilon;
   const float kNoiseAlpha;
   const float kSmartPruningFactor;

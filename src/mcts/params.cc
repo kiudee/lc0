@@ -210,10 +210,10 @@ void SearchParams::Populate(OptionsParser* options) {
   options->Add<IntOption>(kMiniBatchSizeId, 1, 1024) = 256;
   options->Add<IntOption>(kMaxPrefetchBatchId, 0, 1024) = 32;
   options->Add<BoolOption>(kLogitQId) = false;
+  options->Add<BoolOption>(kNewUEnabledId) = false;
   options->Add<FloatOption>(kCpuctId, 0.0f, 100.0f) = 3.0f;
   options->Add<FloatOption>(kCpuctBaseId, 1.0f, 1000000000.0f) = 19652.0f;
   options->Add<FloatOption>(kCpuctFactorId, 0.0f, 1000.0f) = 2.0f;
-  options->Add<BoolOption>(kNewUEnabledId) = false;
   options->Add<FloatOption>(kTemperatureId, 0.0f, 100.0f) = 0.0f;
   options->Add<IntOption>(kTempDecayMovesId, 0, 100) = 0;
   options->Add<IntOption>(kTemperatureCutoffMoveId, 0, 1000) = 0;
@@ -257,10 +257,10 @@ void SearchParams::Populate(OptionsParser* options) {
 SearchParams::SearchParams(const OptionsDict& options)
     : options_(options),
       kLogitQ(options.Get<bool>(kLogitQId.GetId())),
+      kNewUEnabled(options.Get<bool>(kNewUEnabledId.GetId())),
       kCpuct(options.Get<float>(kCpuctId.GetId())),
       kCpuctBase(options.Get<float>(kCpuctBaseId.GetId())),
       kCpuctFactor(options.Get<float>(kCpuctFactorId.GetId())),
-      kNewUEnabled(options.Get<bool>(kNewUEnabledId.GetId())),
       kNoiseEpsilon(options.Get<bool>(kNoiseId.GetId())
                         ? 0.25f
                         : options.Get<float>(kNoiseEpsilonId.GetId())),

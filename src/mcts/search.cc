@@ -195,7 +195,7 @@ namespace {
 inline float GetFpu(const SearchParams& params, Node* node,
                     bool is_root_node, bool logit_q = false) {
   const auto value = params.GetFpuValue(is_root_node);
-  const auto Q = logit_q ? node->GetQ() : FastLogit(node->GetQ());
+  const auto Q = logit_q ? FastLogit(node->GetQ()) : node->GetQ();
   return params.GetFpuAbsolute(is_root_node)
              ? value
              : -Q - value * std::sqrt(node->GetVisitedPolicy());
@@ -230,7 +230,7 @@ std::vector<std::string> Search::GetVerboseStats(Node* node,
           a.GetN(), a.GetQ(fpu, logit_q) + a.GetNewU(U_coeff)) <
           std::forward_as_tuple(
           b.GetN(), b.GetQ(fpu, logit_q) + b.GetNewU(U_coeff));
-      });  
+      });
   } else {
   std::sort(
       edges.begin(), edges.end(),
@@ -1191,7 +1191,7 @@ int SearchWorker::PrefetchIntoCache(Node* node, int budget) {
     // Flip the sign of a score to be able to easily sort.
     scores.emplace_back(-(params_.GetNewUEnabled() ? edge.GetNewU(puct_mult) :
                                                      edge.GetU(puct_mult))
-                        - edge.GetQ(fpu, params_.GetLogitQ()),, edge);
+                        - edge.GetQ(fpu, params_.GetLogitQ()), edge);
   }
 
   size_t first_unsorted_index = 0;
