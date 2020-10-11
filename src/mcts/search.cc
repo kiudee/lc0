@@ -1651,8 +1651,9 @@ void SearchWorker::FetchSingleNodeResult(NodeToProcess* node_to_process,
     const float p = intermediate[counter++] * scale;
     edge.edge()->SetP(p);
     edge.edge()->SetPolicy(p);
-    edge.edge()->SetRENTSQ(
-        tanh(atanh(-node_to_process->v) + atanh(p - unif)));
+    edge.edge()->SetRENTSQ(-node_to_process->v);
+    //edge.edge()->SetRENTSQ(
+    //    tanh(atanh(-node_to_process->v) + atanh(p - unif)));
   }
   // Add Dirichlet noise if enabled and at root.
   if (params_.GetNoiseEpsilon() && node == search_->root_node_) {
