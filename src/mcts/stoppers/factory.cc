@@ -49,21 +49,63 @@ const OptionId kTimeManagerId{
     "Name and config of a time manager. "
     "Possible names are 'legacy', 'smooth' (default) and 'alphazero'."
     "See https://lc0.org/timemgr for configuration details."};
+
+const OptionId kITRId{"init-tree-reuse", "init-tree-reuse",""};
+const OptionId kMTRId{"max-tree-reuse", "max-tree-reuse",""};
+const OptionId kTRURId{"tree-reuse-update-rate", "tree-reuse-update-rate",""};
+const OptionId kNURId{"nps-update-rate", "nps-update-rate",""};
+const OptionId kITId{"init-timeuse", "init-timeuse",""};
+const OptionId kMTId{"min-timeuse", "min-timeuse",""};
+const OptionId kTURId{"timeuse-update-rate", "timeuse-update-rate",""};
+const OptionId kMMBId{"max-move-budget", "max-move-budget",""};
+const OptionId kIPId{"init-piggybank", "init-piggybank",""};
+const OptionId kPMPId{"per-move-piggybank", "per-move-piggybank",""};
+const OptionId kMPUId{"max-piggybank-use", "max-piggybank-use",""};
+const OptionId kMPMId{"max-piggybank-moves", "max-piggybank-moves",""};
 }  // namespace
+
 
 void PopulateTimeManagementOptions(RunType for_what, OptionsParser* options) {
   PopulateCommonStopperOptions(for_what, options);
   if (for_what == RunType::kUci) {
     options->Add<IntOption>(kMoveOverheadId, 0, 100000000) = 200;
-    options->Add<StringOption>(kTimeManagerId) = "smooth";
+    options->Add<FloatOption>(kITRId, 0, 10) = 0.5f;
+    options->Add<FloatOption>(kMTRId, 0, 10) = 0.8f;
+    options->Add<FloatOption>(kTRURId, 0, 10) = 3.0f;
+    options->Add<FloatOption>(kNURId, 0, 10) = 5.0f;
+    options->Add<FloatOption>(kITId, 0, 10) = 0.5f;
+    options->Add<FloatOption>(kMTId, 0, 10) = 0.2f;
+    options->Add<FloatOption>(kTURId, 0, 10) = 3.0f;
+    options->Add<FloatOption>(kMMBId, 0, 10) = 0.3f;
+    options->Add<FloatOption>(kIPId, 0, 10) = 0.0f;
+    options->Add<FloatOption>(kPMPId, 0, 10) = 0.18f;
+    options->Add<FloatOption>(kMPUId, 0, 10) = 0.95f;
+    options->Add<FloatOption>(kMPMId, 0, 100) = 27.0f;
+
   }
 }
 
 std::unique_ptr<TimeManager> MakeTimeManager(const OptionsDict& options) {
   const int64_t move_overhead = options.Get<int>(kMoveOverheadId);
 
+  std::ostringstream oss;
+  oss << "smooth(";
+  oss << "init-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITRId);
+  oss << ",max-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kMTRId);
+  oss << ",tree-reuse-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kTRURId);
+  oss << ",nps-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kNURId);
+  oss << ",init-timeuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITId);
+  oss << ",min-timeuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kMTId);
+  oss << ",timeuse-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kTURId);
+  oss << ",max-move-budget=" << std::setprecision(5) << std::fixed << options.Get<float>(kMMBId);
+  oss << ",init-piggybank=" << std::setprecision(5) << std::fixed << options.Get<float>(kIPId);
+  oss << ",per-move-piggybank=" << std::setprecision(5) << std::fixed << options.Get<float>(kPMPId);
+  oss << ",max-piggybank-use=" << std::setprecision(5) << std::fixed << options.Get<float>(kMPUId);
+  oss << ",max-piggybank-moves=" << std::setprecision(5) << std::fixed << options.Get<float>(kMPMId);
+  oss << ")";
+
   OptionsDict tm_options;
-  tm_options.AddSubdictFromString(options.Get<std::string>(kTimeManagerId));
+  tm_options.AddSubdictFromString(oss.str());
 
   const auto managers = tm_options.ListSubdicts();
 
