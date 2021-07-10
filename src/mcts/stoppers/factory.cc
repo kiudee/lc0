@@ -50,6 +50,8 @@ const OptionId kTimeManagerId{
     "Possible names are 'legacy', 'smooth' (default) and 'alphazero'."
     "See https://lc0.org/timemgr for configuration details."};
 
+const OptionId kMPId{"midpoint-move", "midpoint-move",""};
+const OptionId kSTId{"steepness", "steepness",""};
 const OptionId kITRId{"init-tree-reuse", "init-tree-reuse",""};
 const OptionId kMTRId{"max-tree-reuse", "max-tree-reuse",""};
 const OptionId kTRURId{"tree-reuse-update-rate", "tree-reuse-update-rate",""};
@@ -69,6 +71,8 @@ void PopulateTimeManagementOptions(RunType for_what, OptionsParser* options) {
   PopulateCommonStopperOptions(for_what, options);
   if (for_what == RunType::kUci) {
     options->Add<IntOption>(kMoveOverheadId, 0, 100000000) = 200;
+    options->Add<FloatOption>(kMPId, 1, 100) = 51.5f;
+    options->Add<FloatOption>(kSTId, 1, 10) = 7.0f;
     options->Add<FloatOption>(kITRId, 0, 10) = 0.5f;
     options->Add<FloatOption>(kMTRId, 0, 10) = 0.8f;
     options->Add<FloatOption>(kTRURId, 0, 10) = 3.0f;
@@ -90,7 +94,9 @@ std::unique_ptr<TimeManager> MakeTimeManager(const OptionsDict& options) {
 
   std::ostringstream oss;
   oss << "smooth(";
-  oss << "init-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITRId);
+  oss << "midpoint-move=" << std::setprecision(5) << std::fixed << options.Get<float>(kMPId);
+  oss << ",steepness=" << std::setprecision(5) << std::fixed << options.Get<float>(kSTId);
+  oss << ",init-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITRId);
   oss << ",max-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kMTRId);
   oss << ",tree-reuse-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kTRURId);
   oss << ",nps-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kNURId);
