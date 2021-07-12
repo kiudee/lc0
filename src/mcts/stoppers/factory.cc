@@ -50,7 +50,7 @@ const OptionId kTimeManagerId{
     "Possible names are 'legacy', 'smooth' (default) and 'alphazero'."
     "See https://lc0.org/timemgr for configuration details."};
 
-const OptionId kMPId{"midpoint-move", "midpoint-move",""};
+const OptionId kMPId{"midpoint", "midpoint",""};
 const OptionId kSTId{"steepness", "steepness",""};
 const OptionId kITRId{"init-tree-reuse", "init-tree-reuse",""};
 const OptionId kMTRId{"max-tree-reuse", "max-tree-reuse",""};
@@ -94,7 +94,7 @@ std::unique_ptr<TimeManager> MakeTimeManager(const OptionsDict& options) {
 
   std::ostringstream oss;
   oss << "smooth(";
-  oss << "midpoint-move=" << std::setprecision(5) << std::fixed << options.Get<float>(kMPId);
+  oss << "midpoint=" << std::setprecision(5) << std::fixed << options.Get<float>(kMPId);
   oss << ",steepness=" << std::setprecision(5) << std::fixed << options.Get<float>(kSTId);
   oss << ",init-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITRId);
   oss << ",max-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kMTRId);
