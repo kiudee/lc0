@@ -55,7 +55,7 @@ const OptionId kSTId{"steepness", "steepness",""};
 const OptionId kITRId{"init-tree-reuse", "init-tree-reuse",""};
 const OptionId kMTRId{"max-tree-reuse", "max-tree-reuse",""};
 const OptionId kTRURId{"tree-reuse-update-rate", "tree-reuse-update-rate",""};
-const OptionId kNURId{"nps-update-rate", "nps-update-rate",""};
+const OptionId kNURId{"nps-update-period", "nps-update-period",""};
 const OptionId kITId{"init-timeuse", "init-timeuse",""};
 const OptionId kMTId{"min-timeuse", "min-timeuse",""};
 const OptionId kTURId{"timeuse-update-rate", "timeuse-update-rate",""};
@@ -99,7 +99,7 @@ std::unique_ptr<TimeManager> MakeTimeManager(const OptionsDict& options) {
   oss << ",init-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITRId);
   oss << ",max-tree-reuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kMTRId);
   oss << ",tree-reuse-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kTRURId);
-  oss << ",nps-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kNURId);
+  oss << ",nps-update-period=" << std::setprecision(5) << std::fixed << options.Get<float>(kNURId);
   oss << ",init-timeuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kITId);
   oss << ",min-timeuse=" << std::setprecision(5) << std::fixed << options.Get<float>(kMTId);
   oss << ",timeuse-update-rate=" << std::setprecision(5) << std::fixed << options.Get<float>(kTURId);
