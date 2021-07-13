@@ -73,17 +73,17 @@ void PopulateTimeManagementOptions(RunType for_what, OptionsParser* options) {
     options->Add<IntOption>(kMoveOverheadId, 0, 100000000) = 200;
     options->Add<FloatOption>(kMPId, 1, 100) = 51.5f;
     options->Add<FloatOption>(kSTId, 1, 10) = 7.0f;
-    options->Add<FloatOption>(kITRId, 0, 10) = 0.5f;
-    options->Add<FloatOption>(kMTRId, 0, 10) = 0.8f;
+    options->Add<FloatOption>(kITRId, 0, 1) = 0.5f;
+    options->Add<FloatOption>(kMTRId, 0, 1) = 0.8f;
     options->Add<FloatOption>(kTRURId, 0, 10) = 3.0f;
-    options->Add<FloatOption>(kNURId, 0, 10) = 5.0f;
-    options->Add<FloatOption>(kITId, 0, 10) = 0.5f;
-    options->Add<FloatOption>(kMTId, 0, 10) = 0.2f;
+    options->Add<FloatOption>(kNURId, 0, 60) = 20.0f;
+    options->Add<FloatOption>(kITId, 0, 1) = 0.5f;
+    options->Add<FloatOption>(kMTId, 0, 1) = 0.2f;
     options->Add<FloatOption>(kTURId, 0, 10) = 3.0f;
-    options->Add<FloatOption>(kMMBId, 0, 10) = 0.3f;
-    options->Add<FloatOption>(kIPId, 0, 10) = 0.0f;
-    options->Add<FloatOption>(kPMPId, 0, 10) = 0.18f;
-    options->Add<FloatOption>(kMPUId, 0, 10) = 0.95f;
+    options->Add<FloatOption>(kMMBId, 0, 1) = 0.3f;
+    options->Add<FloatOption>(kIPId, 0, 1) = 0.0f;
+    options->Add<FloatOption>(kPMPId, 0, 1) = 0.18f;
+    options->Add<FloatOption>(kMPUId, 0, 1) = 0.95f;
     options->Add<FloatOption>(kMPMId, 0, 100) = 27.0f;
 
   }
