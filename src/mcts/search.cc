@@ -1721,6 +1721,7 @@ void SearchWorker::PickNodesToExtendTask(Node* node, int base_depth,
             cache_filled_idx++;
           }
           if (is_root_node) {
+            /*
             // If there's no chance to catch up to the current best node with
             // remaining playouts, don't consider it.
             // best_move_node_ could have changed since best_node_n was
@@ -1731,6 +1732,7 @@ void SearchWorker::PickNodesToExtendTask(Node* node, int base_depth,
                     best_node_n - cur_iters[idx].GetN()) {
               continue;
             }
+            */
             // If root move filter exists, make sure move is in the list.
             if (!root_move_filter.empty() &&
                 std::find(root_move_filter.begin(), root_move_filter.end(),
