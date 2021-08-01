@@ -49,6 +49,7 @@ const OptionId kTimeManagerId{
     "Name and config of a time manager. "
     "Possible names are 'legacy', 'smooth' (default) and 'alphazero'."
     "See https://lc0.org/timemgr for configuration details."};
+const OptionId kAZTPd{"alphazero-time-pct", "alphazero-time-pct",""};
 }  // namespace
 
 void PopulateTimeManagementOptions(RunType for_what, OptionsParser* options) {
@@ -56,14 +57,20 @@ void PopulateTimeManagementOptions(RunType for_what, OptionsParser* options) {
   if (for_what == RunType::kUci) {
     options->Add<IntOption>(kMoveOverheadId, 0, 100000000) = 200;
     options->Add<StringOption>(kTimeManagerId) = "smooth";
+    options->Add<FloatOption>(kAZTPd, 0, 100) = 5.0f;
   }
 }
 
 std::unique_ptr<TimeManager> MakeTimeManager(const OptionsDict& options) {
   const int64_t move_overhead = options.Get<int>(kMoveOverheadId);
 
+  std::ostringstream oss;
+  oss << "alphazero(";
+  oss << "alphazero-time-pct=" << std::setprecision(5) << std::fixed << options.Get<float>(kAZTPd);
+  oss << ")";
+
   OptionsDict tm_options;
-  tm_options.AddSubdictFromString(options.Get<std::string>(kTimeManagerId));
+  tm_options.AddSubdictFromString(oss.str());
 
   const auto managers = tm_options.ListSubdicts();
 
