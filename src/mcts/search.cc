@@ -379,7 +379,11 @@ std::vector<std::string> Search::GetVerboseStats(Node* node) const {
   const float fpu = GetFpu(params_, node, is_root, draw_score);
   const float cpuct = ComputeCpuct(params_, node->GetN(), is_root);
   const float U_coeff =
-      cpuct * std::sqrt(std::max(node->GetChildrenVisits(), 1u));
+      cpuct * std::sqrt(
+        is_root ?
+        std::sqrt(std::max(node->GetChildrenVisits(), 1u)) :
+        std::log(std::max(node->GetChildrenVisits(), 1u))
+      );
   std::vector<EdgeAndNode> edges;
   for (const auto& edge : node->Edges()) edges.push_back(edge);
 
@@ -1684,7 +1688,11 @@ void SearchWorker::PickNodesToExtendTask(Node* node, int base_depth,
 
       const float cpuct = ComputeCpuct(params_, node->GetN(), is_root_node);
       const float puct_mult =
-          cpuct * std::sqrt(std::max(node->GetChildrenVisits(), 1u));
+          cpuct * std::sqrt(
+            is_root_node ?
+            std::sqrt(std::max(node->GetChildrenVisits(), 1u)) :
+            std::log(std::max(node->GetChildrenVisits(), 1u))
+          );
       int cache_filled_idx = -1;
       while (cur_limit > 0) {
         // Perform UCT for current node.
@@ -2077,7 +2085,11 @@ SearchWorker::NodeToProcess SearchWorker::PickNodeToExtend(
     // playout remains incomplete; we must go deeper.
     const float cpuct = ComputeCpuct(params_, node->GetN(), is_root_node);
     const float puct_mult =
-        cpuct * std::sqrt(std::max(node->GetChildrenVisits(), 1u));
+        cpuct * std::sqrt(
+          is_root_node ?
+          std::sqrt(std::max(node->GetChildrenVisits(), 1u)) :
+          std::log(std::max(node->GetChildrenVisits(), 1u))
+        );
     float best = std::numeric_limits<float>::lowest();
     float best_without_u = std::numeric_limits<float>::lowest();
     float second_best = std::numeric_limits<float>::lowest();
@@ -2281,7 +2293,11 @@ int SearchWorker::PrefetchIntoCache(Node* node, int budget, bool is_odd_depth) {
   const float cpuct =
       ComputeCpuct(params_, node->GetN(), node == search_->root_node_);
   const float puct_mult =
-      cpuct * std::sqrt(std::max(node->GetChildrenVisits(), 1u));
+      cpuct * std::sqrt(
+        node == search_->root_node_ ?
+        std::sqrt(std::max(node->GetChildrenVisits(), 1u)) :
+        std::log(std::max(node->GetChildrenVisits(), 1u))
+      );
   const float fpu =
       GetFpu(params_, node, node == search_->root_node_, draw_score);
   for (auto& edge : node->Edges()) {
