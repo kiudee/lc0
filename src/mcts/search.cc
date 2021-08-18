@@ -1716,7 +1716,7 @@ void SearchWorker::PickNodesToExtendTask(Node* node, int base_depth,
           const float util = current_util[idx];
           if (idx > cache_filled_idx) {
             current_score[idx] =
-                current_pol[idx] * puct_mult / (1 + nstarted) + util;
+                current_pol[idx] * puct_mult / std::sqrt(1 + nstarted) + util;
             cache_filled_idx++;
           }
           if (is_root_node) {
@@ -1766,7 +1766,7 @@ void SearchWorker::PickNodesToExtendTask(Node* node, int base_depth,
             estimated_visits_to_change_best = static_cast<int>(
                 std::max(1.0f, std::min(current_pol[best_idx] * puct_mult /
                                                 (second_best - best_without_u) -
-                                            n1 + 1,
+                                            float(std::sqrt(n1 + 1)),
                                         1e9f)));
           }
           second_best_edge.Reset();
@@ -1800,7 +1800,7 @@ void SearchWorker::PickNodesToExtendTask(Node* node, int base_depth,
             current_nstarted[best_idx] += new_visits;
           }
           current_score[best_idx] = current_pol[best_idx] * puct_mult /
-                                        (1 + current_nstarted[best_idx]) +
+                                        std::sqrt(1 + current_nstarted[best_idx]) +
                                     current_util[best_idx];
         }
         if ((decremented &&
@@ -2340,8 +2340,7 @@ int SearchWorker::PrefetchIntoCache(Node* node, int budget, bool is_odd_depth) {
       if (next_score > q) {
         budget_to_spend =
             std::min(budget, int(edge.GetP() * puct_mult / (next_score - q) -
-                                 edge.GetNStarted()) +
-                                 1);
+                                 std::sqrt(edge.GetNStarted() + 1)));
       } else {
         budget_to_spend = budget;
       }
