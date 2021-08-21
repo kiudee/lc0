@@ -2482,9 +2482,14 @@ void SearchWorker::DoBackupUpdateSingleNode(
       const auto ratio = params_.GetPolicyFlattenRatio();
       const auto num_edges = n->GetNumEdges();
       if (ratio && num_edges) {
-        const auto flat_policy_portion = ratio;
         for (const auto& edge : n->Edges()) {
-          edge.edge()->SetP((1.0f - ratio) * edge.GetP() + flat_policy_portion);
+          const auto p = edge.edge()->GetP();
+          if (p > 0.0f) {
+            const auto x = 2.0f * p - 1.0f;
+            edge.edge()->SetP(
+              ((x + ratio) / (1.0f + x * ratio) + 1.0f) / 2.0f
+            );
+          }
         }
       }
     }
