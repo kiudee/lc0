@@ -1744,6 +1744,7 @@ void SearchWorker::PickNodesToExtendTask(
         // Perform UCT for current node.
         float best = std::numeric_limits<float>::lowest();
         int best_idx = -1;
+        int second_best_idx = -1;
         float best_without_u = std::numeric_limits<float>::lowest();
         float second_best = std::numeric_limits<float>::lowest();
         bool can_exit = false;
@@ -1788,6 +1789,7 @@ void SearchWorker::PickNodesToExtendTask(
           if (score > best) {
             second_best = best;
             second_best_edge = best_edge;
+            second_best_idx = best_idx;
             best = score;
             best_idx = idx;
             best_without_u = util;
@@ -1795,6 +1797,7 @@ void SearchWorker::PickNodesToExtendTask(
           } else if (score > second_best) {
             second_best = score;
             second_best_edge = cur_iters[idx];
+            second_best_idx = idx;
           }
           if (can_exit) break;
           if (nstarted == 0) {
@@ -1815,19 +1818,28 @@ void SearchWorker::PickNodesToExtendTask(
                                             n1 + 1,
                                         1e9f)));
           }
-          second_best_edge.Reset();
           max_limit = std::min(max_limit, estimated_visits_to_change_best);
           new_visits = std::min(cur_limit, estimated_visits_to_change_best);
         } else {
           // No second best - only one edge, so everything goes in here.
           new_visits = cur_limit;
         }
-        if (best_idx >= vtp_last_filled.back()) {
+        int change_idx = (is_root_node && second_best_edge) ? std::max(best_idx, second_best_idx) : best_idx;
+        if (change_idx >= vtp_last_filled.back()) {
           auto* vtp_array = visits_to_perform.back().get()->data();
           std::fill(vtp_array + (vtp_last_filled.back() + 1),
-                    vtp_array + best_idx + 1, 0);
+                    vtp_array + change_idx + 1, 0);
         }
-        (*visits_to_perform.back())[best_idx] += new_visits;
+        if (is_root_node && second_best_edge) {
+          const float second_best_visit_fraction = 0.1f;
+          int best_visits = static_cast<int>(std::round(new_visits * (1.0f - second_best_visit_fraction)));
+          int second_best_visits = new_visits - best_visits;
+          (*visits_to_perform.back())[best_idx] += best_visits;
+          (*visits_to_perform.back())[second_best_idx] += second_best_visits;
+        } else{
+          (*visits_to_perform.back())[best_idx] += new_visits;
+        }
+
         cur_limit -= new_visits;
         Node* child_node = best_edge.GetOrSpawnNode(/* parent */ node);
 
@@ -1862,9 +1874,50 @@ void SearchWorker::PickNodesToExtendTask(
           receiver->back().moves_to_visit = moves_to_path;
           receiver->back().moves_to_visit.push_back(best_edge.GetMove());
         }
-        if (best_idx > vtp_last_filled.back() &&
-            (*visits_to_perform.back())[best_idx] > 0) {
-          vtp_last_filled.back() = best_idx;
+        // Hacky way to do the same for second best move:
+        if (is_root_node && second_best_edge) {
+          Node* second_child_node = second_best_edge.GetOrSpawnNode(/* parent */ node);
+          
+          // Probably best place to check for two-fold draws consistently.
+          // Depth starts with 1 at root, so real depth is depth - 1.
+          EnsureNodeTwoFoldCorrectForDepth(
+              second_child_node, current_path.size() + base_depth + 1 - 1);
+          
+          bool second_decremented = false;
+          if (second_child_node->TryStartScoreUpdate()) {
+            current_nstarted[second_best_idx]++;
+            second_best_visits -= 1;
+            second_decremented = true;
+            if (second_child_node->GetN() > 0 && !second_child_node->IsTerminal()) {
+              second_child_node->IncrementNInFlight(second_best_visits);
+              current_nstarted[second_best_idx] += second_best_visits;
+            }
+            current_score[second_best_idx] = current_pol[second_best_idx] * puct_mult /
+                                          (1 + current_nstarted[second_best_idx]) +
+                                      current_util[second_best_idx];
+          }
+          if ((second_decremented &&
+               (second_child_node->GetN() == 0 || second_child_node->IsTerminal()))) {
+            // Reduce 1 for the visits_to_perform to ensure the collision created
+            // doesn't include this visit.
+            (*visits_to_perform.back())[second_best_idx] -= 1;
+            receiver->push_back(NodeToProcess::Visit(
+                second_child_node,
+                static_cast<uint16_t>(current_path.size() + 1 + base_depth)));
+            completed_visits++;
+            receiver->back().moves_to_visit.reserve(moves_to_path.size() + 1);
+            receiver->back().moves_to_visit = moves_to_path;
+            receiver->back().moves_to_visit.push_back(second_best_edge.GetMove());
+          }
+        }
+
+        if (second_best_edge) {
+          second_best_edge.Reset();
+        }
+
+        if (change_idx > vtp_last_filled.back() &&
+            (*visits_to_perform.back())[change_idx] > 0) {
+          vtp_last_filled.back() = change_idx;
         }
       }
       is_root_node = false;
