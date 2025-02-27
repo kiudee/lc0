@@ -1888,7 +1888,7 @@ void SearchWorker::PickNodesToExtendTask(
           EnsureNodeTwoFoldCorrectForDepth(
               second_child_node, current_path.size() + base_depth + 1 - 1);
 
-          bool decremented = false;
+          decremented = false;
           if (second_child_node->TryStartScoreUpdate()) {
             current_nstarted[second_best_idx]++;
             second_best_visits -= 1;
