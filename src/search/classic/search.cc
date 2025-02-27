@@ -1833,7 +1833,7 @@ void SearchWorker::PickNodesToExtendTask(
             std::fill(vtp_array + (vtp_last_filled.back() + 1),
                       vtp_array + change_idx + 1, 0);
           }
-          const float second_best_visit_fraction = 0.1f;
+          const float second_best_visit_fraction = second_best_edge.GetN() / (best_edge.GetN() + second_best_edge.GetN());
           int best_visits = static_cast<int>(std::round(new_visits * (1.0f - second_best_visit_fraction)));
           int second_best_visits = new_visits - best_visits;
           (*visits_to_perform.back())[best_idx] += best_visits;
