@@ -1826,14 +1826,22 @@ void SearchWorker::PickNodesToExtendTask(
           new_visits = cur_limit;
         }
 
-        if (is_root_node && second_best_edge) {
+        const float second_best_visit_fraction = (is_root_node && second_best_edge) ? 
+              ((best_edge.GetN() + second_best_edge.GetN()) > 0 
+                ? second_best_edge.GetN() / (best_edge.GetN() + second_best_edge.GetN())
+                : 0.5f)  // Default to equal distribution if no visits yet
+              : 0.0f;  // No visits to second best if not at root or no second best
+        const bool second_best_gets_visits = is_root_node && second_best_edge && 
+              std::round(new_visits * second_best_visit_fraction) > 0;
+
+        if (is_root_node && second_best_edge && second_best_gets_visits) {
           int change_idx = (is_root_node && second_best_edge) ? std::max(best_idx, second_best_idx) : best_idx;
           if (change_idx >= vtp_last_filled.back()) {
             auto* vtp_array = visits_to_perform.back().get()->data();
             std::fill(vtp_array + (vtp_last_filled.back() + 1),
                       vtp_array + change_idx + 1, 0);
           }
-          const float second_best_visit_fraction = second_best_edge.GetN() / (best_edge.GetN() + second_best_edge.GetN());
+
           int best_visits = static_cast<int>(std::round(new_visits * (1.0f - second_best_visit_fraction)));
           int second_best_visits = new_visits - best_visits;
           (*visits_to_perform.back())[best_idx] += best_visits;
